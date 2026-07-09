@@ -13,7 +13,8 @@ from pathlib import Path
 
 from docx import Document
 
-from config import load_environment
+from config import get_llm_config, load_environment
+from llm_summary import generate_standup_summary
 
 
 BASE_DIR = Path(__file__).parent
@@ -105,7 +106,9 @@ def suggest_github_updates(team, responses, blockers):
     return updates
 
 
-def create_docx_summary(team, responses, blockers, action_items, github_updates):
+def create_docx_summary(
+    team, responses, blockers, action_items, github_updates, standup_summary
+):
     """Create a formatted Word document summary in the output folder."""
     OUTPUT_DIR.mkdir(exist_ok=True)
 
@@ -115,6 +118,10 @@ def create_docx_summary(team, responses, blockers, action_items, github_updates)
     document = Document()
     document.add_heading("Daily Standup Summary", level=1)
     document.add_paragraph(f"Date: {today}")
+
+    document.add_heading("AI-Generated Summary", level=2)
+    document.add_paragraph(standup_summary["summary"])
+    document.add_paragraph(f"Source: {standup_summary['note']}")
 
     document.add_heading("Team Updates", level=2)
     for response in responses:
@@ -160,12 +167,16 @@ def main():
     blockers = identify_blockers(team, responses)
     action_items = generate_action_items(blockers)
     github_updates = suggest_github_updates(team, responses, blockers)
+    standup_summary = generate_standup_summary(
+        team, responses, blockers, action_items, get_llm_config()
+    )
     output_path = create_docx_summary(
-        team, responses, blockers, action_items, github_updates
+        team, responses, blockers, action_items, github_updates, standup_summary
     )
 
     print("Standup Coach Agent finished successfully.")
     print(f"Blockers found: {len(blockers)}")
+    print(f"LLM summary used: {standup_summary['used_llm']}")
     print(f"Summary saved to: {output_path}")
 
 
