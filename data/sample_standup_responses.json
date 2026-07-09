@@ -1,0 +1,26 @@
+[
+  {
+    "member_id": 1,
+    "yesterday": "Created the sprint plan and reviewed the current task board.",
+    "today": "Check in with each developer and prepare the demo agenda.",
+    "blockers": "Waiting for final feature estimates from the development team."
+  },
+  {
+    "member_id": 2,
+    "yesterday": "Built the first version of the API endpoint for saving user feedback.",
+    "today": "Add validation and write unit tests for the feedback endpoint.",
+    "blockers": "Need clarification on the required feedback fields."
+  },
+  {
+    "member_id": 3,
+    "yesterday": "Designed the dashboard layout and created reusable card components.",
+    "today": "Connect the dashboard cards to sample data.",
+    "blockers": "None"
+  },
+  {
+    "member_id": 4,
+    "yesterday": "Tested prompt formats for summarizing project updates.",
+    "today": "Create a simple summary generator using sample standup data.",
+    "blockers": "Need access to the latest sample responses."
+  }
+]

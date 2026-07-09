@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "name": "Ava Chen",
+    "role": "Project Manager",
+    "github_username": "avachen"
+  },
+  {
+    "id": 2,
+    "name": "Marcus Johnson",
+    "role": "Backend Developer",
+    "github_username": "marcusj"
+  },
+  {
+    "id": 3,
+    "name": "Priya Patel",
+    "role": "Frontend Developer",
+    "github_username": "priyapatel"
+  },
+  {
+    "id": 4,
+    "name": "Noah Williams",
+    "role": "AI/ML Developer",
+    "github_username": "noahw"
+  }
+]
