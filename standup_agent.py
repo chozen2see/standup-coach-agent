@@ -13,6 +13,8 @@ from pathlib import Path
 
 from docx import Document
 
+from config import load_environment
+
 
 BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
@@ -150,6 +152,8 @@ def create_docx_summary(team, responses, blockers, action_items, github_updates)
 
 def main():
     """Run the standup workflow from sample JSON files."""
+    load_environment()
+
     team = load_json_file(DATA_DIR / "sample_team.json")
     responses = load_json_file(DATA_DIR / "sample_standup_responses.json")
 
