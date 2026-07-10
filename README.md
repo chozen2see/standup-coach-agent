@@ -256,6 +256,7 @@ The current project runs locally using sample data, but the same workflow could 
 A production version would use a Python API to receive Slack events, store team updates in a database, use an LLM to structure and review the conversation, request team confirmation, update GitHub, and generate a downloadable Word report.
 
 The current modules are intentionally separated so the local JSON inputs can later be replaced with Slack events and database records without rewriting the reporting workflow.
+
 ---
 
 ## Development Approach
