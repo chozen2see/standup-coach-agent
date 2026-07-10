@@ -1,7 +1,16 @@
-__pycache__/
 *.pyc
-.venv/
 venv/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+
+# Environment
 .env
-output/*.docx
+
+# macOS
 .DS_Store
+
+# Generated output
+output/*.docx
