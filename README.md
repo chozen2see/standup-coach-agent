@@ -5,6 +5,7 @@ Standup Coach Agent is a lightweight Python application I built to show one prac
 The goal isn't to replace team conversations. It's to reduce the follow-up work that usually comes afterward by capturing updates, surfacing blockers, identifying action items, and producing a clear daily summary. The project uses local sample data, so it's easy to run without setting up Slack, GitHub, or an LLM provider first. Optional AI summaries and GitHub Issues support can be enabled as you expand the project.
 
 The project also includes an AI Standup Coach feature. Rather than simply summarizing a standup, it reviews the quality of each person's update and provides practical feedback to help improve future standups.
+
 ---
 
 ## Who This Project Is For
@@ -12,6 +13,7 @@ The project also includes an AI Standup Coach feature. Rather than simply summar
 This project was designed with student software engineering teams in mind, but the workflow can easily be adapted for professional development teams.
 
 Whether you're working through a class project, a hackathon, or a small engineering sprint, the goal is the same: spend less time organizing standup notes and more time building software.
+
 ---
 
 ## Why I Built This
@@ -28,17 +30,19 @@ This project keeps that workflow simple and visible by:
 - Suggesting follow-up action items.
 - Generating GitHub task and issue recommendations.
 - Producing a Word summary that can be shared with teammates, instructors, or stakeholders.
+
 ---
 
 ## Technologies
 
 - Python
 - JSON
-- python-docx
+- `python-docx`
 - Optional OpenAI-compatible LLM integration
 - Optional GitHub Issues integration
 - Slack-style workflow simulation using local JSON data
 - Rule-based coaching when no API key is available
+
 ---
 
 ## Project Structure
@@ -58,7 +62,7 @@ standup-coach-agent/
 ├── README.md
 ├── requirements.txt
 ├── slack_parser.py
-└── standup_agent.py
+├── standup_agent.py
 └── standup_coach.py
 ```
 
@@ -81,7 +85,7 @@ standup-coach-agent/
 | `slack_parser.py` | Converts Slack-style standup messages into the application's standard response format. |
 | `standup_agent.py` | Main application entry point that coordinates the complete standup workflow. |
 | `standup_coach.py` | Reviews each team member's standup update and generates coaching feedback to help improve the quality of future standups. |
-```
+
 ---
 
 ## Getting Started
@@ -224,19 +228,22 @@ The current workflow is intentionally simple:
 8. Generate GitHub recommendations.
 9. Produce a formatted Word report.
 
-The app keeps parsing separate from the reporting workflow, which makes a real Slack bot a natural next step.
+Keeping the parsing logic separate from the reporting workflow makes it easy to introduce a real Slack bot later without changing the rest of the application.
 
 ---
 
 ## Roadmap
 
-Planned enhancements include:
+Ideas I'm interested in exploring next include:
 
 - Real Slack bot integration for interactive standups
+- AI-assisted conversation understanding that can review an entire Slack standup thread, identify meaningful updates for each participant, and convert the conversation into the structured format used by the application
+- Team confirmation step in Slack before updates are sent to GitHub or included in the Word report
 - GitHub Projects synchronization
 - Automated standup reminders
 - Richer AI-generated coaching and next-step recommendations
 - Lightweight web dashboard for team visibility
+
 ---
 
 ## Production Deployment Concept
@@ -248,6 +255,18 @@ A production version would use a Python API to receive Slack events, store team 
 The current modules are intentionally separated so the local JSON inputs can later be replaced with Slack events and database records without rewriting the reporting workflow.
 ---
 
+## Development Approach
+
+This project was built using an AI-assisted development workflow.
+
+I used modern AI development tools to help accelerate implementation, iterate on ideas, review code, and refine documentation. I remained responsible for the overall architecture, feature design, testing, and final technical decisions.
+
+One of the goals of this project was not only to build a working application, but also to explore how AI can become a practical engineering partner throughout the software development lifecycle.
+
+---
+
 ## About This Project
 
-This project is part of a practical exploration of AI-assisted software team workflows. The focus is not AI for its own sake. The focus is helping teams reduce administrative work and keep project information easier to act on.
+I built this project as part of my ongoing work in AI-assisted software engineering.
+
+Rather than using AI simply because it's available, I'm interested in finding practical ways it can reduce repetitive work, improve collaboration, and help teams stay focused on building software.
