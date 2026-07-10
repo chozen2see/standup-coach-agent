@@ -39,6 +39,15 @@ NEXT_STEP_WORDS = {
 }
 
 
+def format_feedback(label, message):
+    """Format coaching feedback with a readable symbol."""
+    symbols = {
+        "good": "✓",
+        "warning": "⚠",
+    }
+    return f"{symbols.get(label, '•')} {message}"
+
+
 def is_empty(value):
     """Return True when a standup field is missing useful content."""
     return not value or not value.strip()
@@ -109,35 +118,61 @@ def coach_standup_response(member, response):
     blockers = response.get("blockers", "")
 
     if is_empty(yesterday):
-        feedback.append("Warning Missing completed work. Add what changed since the last standup.")
+        feedback.append(
+            format_feedback(
+                "warning",
+                "Missing completed work. Add what changed since the last standup.",
+            )
+        )
     elif contains_vague_work(yesterday):
-        feedback.append("Warning Completed work could be more specific.")
+        feedback.append(format_feedback("warning", "Completed work could be more specific."))
     elif has_measurable_progress(yesterday):
-        feedback.append("Good Clear update on completed work.")
+        feedback.append(format_feedback("good", "Clear update on completed work."))
     else:
-        feedback.append("Warning Completed work is understandable, but add a concrete result.")
+        feedback.append(
+            format_feedback(
+                "warning", "Completed work is understandable, but add a concrete result."
+            )
+        )
 
     if is_empty(today):
-        feedback.append("Warning Missing next steps. Add what you plan to do next.")
+        feedback.append(
+            format_feedback("warning", "Missing next steps. Add what you plan to do next.")
+        )
     elif has_next_step(today):
-        feedback.append("Good Clear next step for today.")
+        feedback.append(format_feedback("good", "Clear next step for today."))
     else:
-        feedback.append("Warning Today's goal could be more specific.")
+        feedback.append(format_feedback("warning", "Today's goal could be more specific."))
 
     if is_empty(blockers):
-        feedback.append("Warning Missing blocker status. Say whether you are blocked or not.")
+        feedback.append(
+            format_feedback(
+                "warning", "Missing blocker status. Say whether you are blocked or not."
+            )
+        )
     elif has_no_blocker(blockers):
         feedback.append(
-            "Warning No blocker reported. Confirm whether you are unblocked or need help."
+            format_feedback(
+                "warning",
+                "No blocker reported. Confirm whether you are unblocked or need help.",
+            )
         )
     else:
-        feedback.append("Good Blocker is clear and can be followed up on.")
+        feedback.append(format_feedback("good", "Blocker is clear and can be followed up on."))
 
     if is_unusually_short(response):
-        feedback.append("Warning Standup is unusually short. Add enough detail for the team to act.")
+        feedback.append(
+            format_feedback(
+                "warning", "Standup is unusually short. Add enough detail for the team to act."
+            )
+        )
 
     if has_unnecessary_information(response):
-        feedback.append("Warning Standup may include extra detail. Keep it focused on project work.")
+        feedback.append(
+            format_feedback(
+                "warning", "Standup may include extra detail. Keep it focused on project work."
+            )
+        )
 
     return {
         "name": member["name"],
@@ -188,11 +223,28 @@ def build_coaching_prompt(team, responses):
         "Return only JSON in this format:\n"
         "{\n"
         '  "items": [\n'
-        '    {"name": "Name", "role": "Role", "feedback": ["Good ...", "Warning ..."]}\n'
+        '    {"name": "Name", "role": "Role", "feedback": ["✓ ...", "⚠ ..."]}\n'
         "  ]\n"
         "}\n\n"
         f"Standup updates:\n{json.dumps(standup_details, indent=2)}"
     )
+
+
+def normalize_feedback_text(feedback):
+    """Convert simple LLM labels into the project's report format."""
+    clean_feedback = feedback.strip()
+    replacements = {
+        "Good ": "✓ ",
+        "Warning ": "⚠ ",
+        "Good:": "✓",
+        "Warning:": "⚠",
+    }
+
+    for old_text, new_text in replacements.items():
+        if clean_feedback.startswith(old_text):
+            return clean_feedback.replace(old_text, new_text, 1)
+
+    return clean_feedback
 
 
 def parse_llm_coaching_response(response_text):
@@ -209,7 +261,10 @@ def parse_llm_coaching_response(response_text):
             {
                 "name": item.get("name", "Unknown"),
                 "role": item.get("role", ""),
-                "feedback": item.get("feedback", []),
+                "feedback": [
+                    normalize_feedback_text(feedback)
+                    for feedback in item.get("feedback", [])
+                ],
             }
         )
 
