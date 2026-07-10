@@ -11,20 +11,20 @@
     "user_name": "Marcus Johnson",
     "channel": "proj-standup",
     "timestamp": "2026-07-09T09:03:00-04:00",
-    "text": "Yesterday: Built the first version of the API endpoint for saving user feedback.\nToday: Add validation and write unit tests for the feedback endpoint.\nBlockers: Need clarification on the required feedback fields."
+    "text": "Yesterday: Worked on backend stuff.\nToday: More API work.\nBlockers:"
   },
   {
     "user_id": "U003",
     "user_name": "Priya Patel",
     "channel": "proj-standup",
     "timestamp": "2026-07-09T09:05:00-04:00",
-    "text": "Yesterday: Designed the dashboard layout and created reusable card components.\nToday: Connect the dashboard cards to sample data.\nBlockers: None"
+    "text": "Yesterday: Designed the dashboard layout and created reusable card components.\nToday: Connect the dashboard cards to sample data and verify each card renders the expected project metrics.\nBlockers: None"
   },
   {
     "user_id": "U004",
     "user_name": "Noah Williams",
     "channel": "proj-standup",
     "timestamp": "2026-07-09T09:07:00-04:00",
-    "text": "Yesterday: Tested prompt formats for summarizing project updates.\nToday: Create a simple summary generator using sample standup data.\nBlockers: Need access to the latest sample responses."
+    "text": "Yesterday: Updated things.\nToday:\nBlockers: Need access to the latest sample responses."
   }
 ]

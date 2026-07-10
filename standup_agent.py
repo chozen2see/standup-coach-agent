@@ -55,7 +55,7 @@ def response_has_blocker(response):
     blocker_text = response["blockers"].strip().lower()
     no_blocker_answers = ["none", "no", "no blockers", "n/a", "na"]
 
-    return blocker_text not in no_blocker_answers
+    return bool(blocker_text) and blocker_text not in no_blocker_answers
 
 
 def identify_blockers(team, responses):
