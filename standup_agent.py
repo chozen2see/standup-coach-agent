@@ -27,6 +27,7 @@ from github_issues import (
 )
 from llm_summary import generate_standup_summary
 from slack_parser import slack_messages_to_standup_responses
+from standup_coach import generate_standup_coaching
 
 
 BASE_DIR = Path(__file__).parent
@@ -131,7 +132,13 @@ def load_standup_responses(team, input_mode):
 
 
 def create_docx_summary(
-    team, responses, blockers, action_items, github_updates, standup_summary
+    team,
+    responses,
+    blockers,
+    action_items,
+    github_updates,
+    standup_summary,
+    coaching_result,
 ):
     """Create a formatted Word document summary in the output folder."""
     OUTPUT_DIR.mkdir(exist_ok=True)
@@ -146,6 +153,13 @@ def create_docx_summary(
     document.add_heading("AI-Generated Summary", level=2)
     document.add_paragraph(standup_summary["summary"])
     document.add_paragraph(f"Source: {standup_summary['note']}")
+
+    document.add_heading("Standup Coaching Feedback", level=2)
+    document.add_paragraph(f"Source: {coaching_result['note']}")
+    for item in coaching_result["items"]:
+        document.add_heading(f"{item['name']} - {item['role']}", level=3)
+        for feedback in item["feedback"]:
+            document.add_paragraph(feedback, style="List Bullet")
 
     document.add_heading("Team Updates", level=2)
     for response in responses:
@@ -197,14 +211,22 @@ def main():
     standup_summary = generate_standup_summary(
         team, responses, blockers, action_items, get_llm_config()
     )
+    coaching_result = generate_standup_coaching(team, responses, get_llm_config())
     output_path = create_docx_summary(
-        team, responses, blockers, action_items, github_updates, standup_summary
+        team,
+        responses,
+        blockers,
+        action_items,
+        github_updates,
+        standup_summary,
+        coaching_result,
     )
 
     print("Standup Coach Agent finished successfully.")
     print(f"Input mode: {input_mode}")
     print(f"Blockers found: {len(blockers)}")
     print(f"LLM summary used: {standup_summary['used_llm']}")
+    print(f"LLM coaching used: {coaching_result['used_llm']}")
     print(f"Summary saved to: {output_path}")
 
     if github_config["create_issues"]:
