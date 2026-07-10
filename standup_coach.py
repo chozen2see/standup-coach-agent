@@ -6,6 +6,11 @@ standup summary. The goal is to help teammates write clearer engineering
 standups over time.
 """
 
+import json
+import urllib.error
+
+from llm_summary import call_openai_responses_api
+
 
 NO_BLOCKER_VALUES = {"none", "no", "no blockers", "n/a", "na"}
 VAGUE_WORDS = {"stuff", "things", "worked on", "handled", "helped", "updated"}
@@ -153,4 +158,94 @@ def generate_rule_based_coaching(team, responses):
         "items": coaching,
         "used_llm": False,
         "note": "Generated with rule-based coaching.",
+    }
+
+
+def build_coaching_prompt(team, responses):
+    """Build an LLM prompt focused on coaching standup quality."""
+    standup_details = []
+
+    for response in responses:
+        member = next(person for person in team if person["id"] == response["member_id"])
+        standup_details.append(
+            {
+                "name": member["name"],
+                "role": member["role"],
+                "yesterday": response["yesterday"],
+                "today": response["today"],
+                "blockers": response["blockers"],
+            }
+        )
+
+    return (
+        "You are an engineering standup coach. Review the quality of each "
+        "team member's standup update. Do not summarize the standup. Give each "
+        "person short, practical coaching that helps them write better daily "
+        "engineering updates. Check for missing or incomplete updates, missing "
+        "blockers, vague work, lack of measurable progress, missing requests "
+        "for help, missing next steps, unusually short updates, and unnecessary "
+        "detail.\n\n"
+        "Return only JSON in this format:\n"
+        "{\n"
+        '  "items": [\n'
+        '    {"name": "Name", "role": "Role", "feedback": ["Good ...", "Warning ..."]}\n'
+        "  ]\n"
+        "}\n\n"
+        f"Standup updates:\n{json.dumps(standup_details, indent=2)}"
+    )
+
+
+def parse_llm_coaching_response(response_text):
+    """Parse LLM coaching JSON into the expected coaching shape."""
+    parsed = json.loads(response_text)
+
+    if not isinstance(parsed, dict) or not isinstance(parsed.get("items"), list):
+        raise ValueError("LLM coaching response did not include an items list.")
+
+    coaching_items = []
+
+    for item in parsed["items"]:
+        coaching_items.append(
+            {
+                "name": item.get("name", "Unknown"),
+                "role": item.get("role", ""),
+                "feedback": item.get("feedback", []),
+            }
+        )
+
+    return coaching_items
+
+
+def generate_standup_coaching(team, responses, llm_config):
+    """Generate LLM coaching when possible, otherwise use rule-based coaching."""
+    fallback = generate_rule_based_coaching(team, responses)
+
+    if not llm_config["api_key"]:
+        return {
+            "items": fallback["items"],
+            "used_llm": False,
+            "note": "No API key found. Used rule-based coaching.",
+        }
+
+    prompt = build_coaching_prompt(team, responses)
+
+    try:
+        llm_response = call_openai_responses_api(prompt, llm_config)
+        coaching_items = parse_llm_coaching_response(llm_response)
+    except (
+        urllib.error.URLError,
+        TimeoutError,
+        json.JSONDecodeError,
+        ValueError,
+    ) as error:
+        return {
+            "items": fallback["items"],
+            "used_llm": False,
+            "note": f"LLM coaching failed. Used rule-based coaching. Error: {error}",
+        }
+
+    return {
+        "items": coaching_items,
+        "used_llm": True,
+        "note": "Generated with optional LLM coaching.",
     }
