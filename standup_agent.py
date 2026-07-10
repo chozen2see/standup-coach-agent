@@ -195,7 +195,7 @@ def create_docx_summary(
     document.add_heading("Suggested GitHub Task Board Updates", level=2)
     for update in github_updates:
         document.add_paragraph(
-            f"@{update['task_owner']} -> {update['suggested_column']}: {update['note']}",
+            f"@{update['task_owner']}: {update['suggested_column']} | {update['note']}",
             style="List Bullet",
         )
 
