@@ -13,7 +13,8 @@ from pathlib import Path
 
 from docx import Document
 
-from config import get_llm_config, load_environment
+from config import get_github_config, get_llm_config, load_environment
+from github_issues import build_github_issue_payloads, print_github_issue_dry_run
 from llm_summary import generate_standup_summary
 
 
@@ -168,6 +169,8 @@ def main():
     blockers = identify_blockers(team, responses)
     action_items = generate_action_items(blockers)
     github_updates = suggest_github_updates(team, responses, blockers)
+    github_config = get_github_config()
+    github_issue_payloads = build_github_issue_payloads(blockers, action_items)
     standup_summary = generate_standup_summary(
         team, responses, blockers, action_items, get_llm_config()
     )
@@ -179,6 +182,9 @@ def main():
     print(f"Blockers found: {len(blockers)}")
     print(f"LLM summary used: {standup_summary['used_llm']}")
     print(f"Summary saved to: {output_path}")
+
+    if not github_config["create_issues"]:
+        print_github_issue_dry_run(github_issue_payloads)
 
 
 if __name__ == "__main__":

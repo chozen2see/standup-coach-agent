@@ -39,3 +39,14 @@ def get_llm_config():
         "api_key": os.getenv("OPENAI_API_KEY", ""),
         "model": os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
     }
+
+
+def get_github_config():
+    """Return optional GitHub Issues settings from environment variables."""
+    return {
+        "token": os.getenv("GITHUB_TOKEN", ""),
+        "repo_owner": os.getenv("GITHUB_REPO_OWNER", ""),
+        "repo_name": os.getenv("GITHUB_REPO_NAME", ""),
+        "create_issues": os.getenv("GITHUB_CREATE_ISSUES", "false").lower()
+        == "true",
+    }

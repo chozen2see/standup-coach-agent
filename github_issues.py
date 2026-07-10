@@ -42,3 +42,25 @@ def build_github_issue_payloads(blockers, action_items):
         issue_payloads.append(payload)
 
     return issue_payloads
+
+
+def print_github_issue_dry_run(issue_payloads):
+    """Print the GitHub issues that would be created."""
+    print("\nGitHub Issues dry run")
+    print("---------------------")
+
+    if not issue_payloads:
+        print("No blocker issues would be created today.")
+        return
+
+    for number, payload in enumerate(issue_payloads, start=1):
+        print(f"Issue {number}: {payload['title']}")
+        print(f"Labels: {', '.join(payload['labels'])}")
+
+        assignees = payload.get("assignees", [])
+        if assignees:
+            print(f"Assignees: {', '.join(assignees)}")
+
+        print("Body:")
+        print(payload["body"])
+        print()
