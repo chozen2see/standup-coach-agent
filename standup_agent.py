@@ -13,7 +13,12 @@ from pathlib import Path
 
 from docx import Document
 
-from config import get_github_config, get_llm_config, load_environment
+from config import (
+    get_github_config,
+    get_llm_config,
+    get_standup_input_mode,
+    load_environment,
+)
 from github_issues import (
     build_github_issue_payloads,
     create_github_issues,
@@ -21,6 +26,7 @@ from github_issues import (
     print_github_issue_results,
 )
 from llm_summary import generate_standup_summary
+from slack_parser import slack_messages_to_standup_responses
 
 
 BASE_DIR = Path(__file__).parent
@@ -113,6 +119,15 @@ def suggest_github_updates(team, responses, blockers):
     return updates
 
 
+def load_standup_responses(team, input_mode):
+    """Load standup responses from structured JSON or Slack-style messages."""
+    if input_mode == "slack":
+        slack_messages = load_json_file(DATA_DIR / "sample_slack_messages.json")
+        return slack_messages_to_standup_responses(team, slack_messages)
+
+    return load_json_file(DATA_DIR / "sample_standup_responses.json")
+
+
 def create_docx_summary(
     team, responses, blockers, action_items, github_updates, standup_summary
 ):
@@ -169,7 +184,8 @@ def main():
     load_environment()
 
     team = load_json_file(DATA_DIR / "sample_team.json")
-    responses = load_json_file(DATA_DIR / "sample_standup_responses.json")
+    input_mode = get_standup_input_mode()
+    responses = load_standup_responses(team, input_mode)
 
     blockers = identify_blockers(team, responses)
     action_items = generate_action_items(blockers)
@@ -184,6 +200,7 @@ def main():
     )
 
     print("Standup Coach Agent finished successfully.")
+    print(f"Input mode: {input_mode}")
     print(f"Blockers found: {len(blockers)}")
     print(f"LLM summary used: {standup_summary['used_llm']}")
     print(f"Summary saved to: {output_path}")

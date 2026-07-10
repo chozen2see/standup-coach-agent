@@ -50,3 +50,8 @@ def get_github_config():
         "create_issues": os.getenv("GITHUB_CREATE_ISSUES", "false").lower()
         == "true",
     }
+
+
+def get_standup_input_mode():
+    """Return the input mode for standup responses."""
+    return os.getenv("STANDUP_INPUT_MODE", "structured").strip().lower()
