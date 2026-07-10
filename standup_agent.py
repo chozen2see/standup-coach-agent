@@ -56,6 +56,7 @@ def identify_blockers(team, responses):
                 {
                     "name": member["name"],
                     "role": member["role"],
+                    "github_username": member["github_username"],
                     "blocker": response["blockers"],
                 }
             )
