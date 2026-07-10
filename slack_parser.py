@@ -1,8 +1,8 @@
 """
 Helpers for turning Slack-style standup messages into standup responses.
 
-The project uses local JSON fixtures for now. A real Slack app could provide
-messages in a similar shape later.
+The project uses local JSON fixtures for now. A real Slack bot could provide
+messages in a similar shape later after reading a channel or modal submission.
 """
 
 
@@ -49,6 +49,7 @@ def slack_messages_to_standup_responses(team, slack_messages):
     responses = []
 
     for message in slack_messages:
+        # A real Slack bot could map Slack user IDs to team members here.
         member = find_member_by_name(team, message["user_name"])
 
         if not member:

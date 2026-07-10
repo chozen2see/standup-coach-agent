@@ -122,6 +122,8 @@ def suggest_github_updates(team, responses, blockers):
 def load_standup_responses(team, input_mode):
     """Load standup responses from structured JSON or Slack-style messages."""
     if input_mode == "slack":
+        # Future Slack bot integration can replace this fixture with messages
+        # fetched from Slack before they are passed into the parser.
         slack_messages = load_json_file(DATA_DIR / "sample_slack_messages.json")
         return slack_messages_to_standup_responses(team, slack_messages)
 
