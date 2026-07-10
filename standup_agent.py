@@ -131,6 +131,14 @@ def load_standup_responses(team, input_mode):
     return load_json_file(DATA_DIR / "sample_standup_responses.json")
 
 
+def display_response_value(value):
+    """Return readable report text for a standup response field."""
+    if value and value.strip():
+        return value
+
+    return "Not provided"
+
+
 def create_docx_summary(
     team,
     responses,
@@ -166,9 +174,9 @@ def create_docx_summary(
         member = find_team_member(team, response["member_id"])
 
         document.add_heading(f"{member['name']} - {member['role']}", level=3)
-        document.add_paragraph(f"Yesterday: {response['yesterday']}")
-        document.add_paragraph(f"Today: {response['today']}")
-        document.add_paragraph(f"Blockers: {response['blockers']}")
+        document.add_paragraph(f"Yesterday: {display_response_value(response['yesterday'])}")
+        document.add_paragraph(f"Today: {display_response_value(response['today'])}")
+        document.add_paragraph(f"Blockers: {display_response_value(response['blockers'])}")
 
     document.add_heading("Blockers", level=2)
     if blockers:
