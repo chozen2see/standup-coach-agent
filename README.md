@@ -105,6 +105,7 @@ python standup_agent.py
 ```
 
 After the script completes, a formatted Word document is generated in the `output/` folder.
+
 ---
 
 ## Slack-Style Workflow Demo
@@ -153,6 +154,7 @@ OPENAI_MODEL=gpt-4o-mini
 ```
 
 If no API key is provided, the application automatically falls back to its built-in summary generation.
+
 ---
 
 ## AI Standup Coach
@@ -187,6 +189,7 @@ The current demo intentionally uses structured Slack-style messages so the workf
 In a production implementation, an AI conversation understanding layer could review an entire Slack thread, identify meaningful updates for each participant, and convert the conversation into the structured format used by the application.
 
 Before updating GitHub or generating the Word report, the agent could post a draft summary back into Slack so the team can confirm that the updates were captured correctly.
+
 ---
 
 ## Optional GitHub Issues Integration
