@@ -21,6 +21,7 @@ Student AI project teams often need a simple way to stay organized during fast-m
 - JSON sample data
 - `python-docx` for Word document generation
 - Optional OpenAI-compatible LLM summary generation
+- Optional GitHub Issues integration
 
 ## Project Structure
 
@@ -72,6 +73,29 @@ Do not commit real API keys. The `.gitignore` file excludes `.env`.
 
 If no API key is provided, the app automatically uses a simple rule-based summary instead.
 
+## Optional GitHub Issues Setup
+
+The app can convert reported blockers into GitHub issue payloads. Dry-run mode is the default, so the app prints the issues that would be created without calling the GitHub API.
+
+To configure GitHub, copy `.env.example` to `.env` and set:
+
+```text
+GITHUB_TOKEN=your_github_token_here
+GITHUB_REPO_OWNER=your_github_username_or_org
+GITHUB_REPO_NAME=your_repository_name
+GITHUB_CREATE_ISSUES=false
+```
+
+Keep `GITHUB_CREATE_ISSUES=false` to preview issues in dry-run mode.
+
+To create real GitHub Issues, set:
+
+```text
+GITHUB_CREATE_ISSUES=true
+```
+
+If required GitHub values are missing, the app skips issue creation gracefully.
+
 ## How To Run
 
 Run the script from the project folder:
@@ -91,7 +115,9 @@ The script follows a simple workflow:
 3. Identify team members who reported blockers.
 4. Generate action items from those blockers.
 5. Suggest GitHub task board updates.
-6. Create a formatted Word document summary in `output/`.
+6. Generate GitHub issue payloads for blockers.
+7. Print a dry run of issues or optionally create GitHub Issues.
+8. Create a formatted Word document summary in `output/`.
 
 ## Future Enhancements
 
