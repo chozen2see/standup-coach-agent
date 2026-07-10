@@ -14,7 +14,12 @@ from pathlib import Path
 from docx import Document
 
 from config import get_github_config, get_llm_config, load_environment
-from github_issues import build_github_issue_payloads, print_github_issue_dry_run
+from github_issues import (
+    build_github_issue_payloads,
+    create_github_issues,
+    print_github_issue_dry_run,
+    print_github_issue_results,
+)
 from llm_summary import generate_standup_summary
 
 
@@ -183,7 +188,10 @@ def main():
     print(f"LLM summary used: {standup_summary['used_llm']}")
     print(f"Summary saved to: {output_path}")
 
-    if not github_config["create_issues"]:
+    if github_config["create_issues"]:
+        github_result = create_github_issues(github_issue_payloads, github_config)
+        print_github_issue_results(github_result)
+    else:
         print_github_issue_dry_run(github_issue_payloads)
 
 

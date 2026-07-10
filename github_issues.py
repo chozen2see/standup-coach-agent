@@ -5,6 +5,13 @@ The first step is to generate issue payloads locally. Later steps can decide
 whether to print those payloads as a dry run or send them to the GitHub API.
 """
 
+import json
+import urllib.error
+import urllib.request
+
+
+GITHUB_API_URL = "https://api.github.com"
+
 
 def create_issue_body(blocker, action_item):
     """Create a beginner-friendly GitHub issue body."""
@@ -64,3 +71,90 @@ def print_github_issue_dry_run(issue_payloads):
         print("Body:")
         print(payload["body"])
         print()
+
+
+def github_config_is_complete(github_config):
+    """Return True when all required GitHub settings are available."""
+    required_keys = ["token", "repo_owner", "repo_name"]
+
+    for key in required_keys:
+        if not github_config.get(key):
+            return False
+
+    return True
+
+
+def create_github_issue(payload, github_config):
+    """Create one GitHub issue using the GitHub REST API."""
+    url = (
+        f"{GITHUB_API_URL}/repos/"
+        f"{github_config['repo_owner']}/{github_config['repo_name']}/issues"
+    )
+    request_data = json.dumps(payload).encode("utf-8")
+
+    request = urllib.request.Request(
+        url,
+        data=request_data,
+        headers={
+            "Authorization": f"Bearer {github_config['token']}",
+            "Accept": "application/vnd.github+json",
+            "Content-Type": "application/json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        },
+        method="POST",
+    )
+
+    with urllib.request.urlopen(request, timeout=30) as response:
+        return json.loads(response.read().decode("utf-8"))
+
+
+def create_github_issues(issue_payloads, github_config):
+    """Create GitHub issues when enabled and configured."""
+    if not github_config["create_issues"]:
+        return {
+            "created": [],
+            "skipped": True,
+            "message": "GitHub issue creation is disabled. Dry-run mode is active.",
+        }
+
+    if not github_config_is_complete(github_config):
+        return {
+            "created": [],
+            "skipped": True,
+            "message": (
+                "GitHub issue creation skipped. Set GITHUB_TOKEN, "
+                "GITHUB_REPO_OWNER, and GITHUB_REPO_NAME to create issues."
+            ),
+        }
+
+    created_issues = []
+
+    for payload in issue_payloads:
+        try:
+            created_issue = create_github_issue(payload, github_config)
+        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as error:
+            return {
+                "created": created_issues,
+                "skipped": False,
+                "message": f"Stopped after a GitHub API error: {error}",
+            }
+
+        created_issues.append(created_issue)
+
+    return {
+        "created": created_issues,
+        "skipped": False,
+        "message": f"Created {len(created_issues)} GitHub issue(s).",
+    }
+
+
+def print_github_issue_results(result):
+    """Print a short summary of GitHub issue creation results."""
+    print("\nGitHub Issues result")
+    print("--------------------")
+    print(result["message"])
+
+    for issue in result["created"]:
+        issue_url = issue.get("html_url", "No URL returned")
+        issue_title = issue.get("title", "Untitled issue")
+        print(f"- {issue_title}: {issue_url}")
